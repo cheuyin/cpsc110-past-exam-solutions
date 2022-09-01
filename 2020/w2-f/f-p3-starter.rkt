@@ -39,11 +39,19 @@
 (@template use-abstract-fn fn-composition)
 
 (define (stacked-e-squares loc n)
-  (foldr (lambda (c rnr) (above (square n "solid" c) rnr))
-         empty-image
-         (filter (lambda (c)
-                   (string=? "e" (substring c (sub1 (string-length c)))))
-                 loc)))
+  (local [(define (fn1 c) (string=? "e" (substring c (sub1 (string-length c)))))
+          (define (fn2 c) (square n "solid" c))]
+    (foldr above empty-image (map fn2 (filter fn1 loc)))))
+
+
+
+
+
+
+
+
+
+
 
 
 
