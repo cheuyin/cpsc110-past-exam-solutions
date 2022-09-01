@@ -63,16 +63,17 @@
            
 (define (decode lon0)
   ;; rsf is Natural; sum of non-skipped even naturals so far
-  ;; acc is Natural; num of even numbers to skip
+  ;; acc is Natural; num of even numbers remaining to skip
   (local [(define (decode lon rsf acc)
             (cond [(empty? lon) rsf]
-                  [else
-                   (if (and (zero? acc) (even? (first lon)))
-                       (decode (rest lon) (+ rsf (first lon)) acc)
-                       (if (odd? (first lon))
-                           (decode (rest lon) rsf (+ acc (first lon)))
-                           (decode (rest lon) rsf (sub1 acc))))]))]
+                  [(and (zero? acc) (even? (first lon)))
+                   (decode (rest lon) (+ rsf (first lon)) acc)]
+                  [(odd? (first lon))
+                   (decode (rest lon) rsf (+ acc (first lon)))]
+                  [else (decode (rest lon) rsf (sub1 acc))]))]
     (decode lon0 0 0)))
+
+
 
 
 
