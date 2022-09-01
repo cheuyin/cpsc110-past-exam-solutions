@@ -1,0 +1,28 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname f-p1-solution) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+(require spd/tags)
+
+
+(@assignment f-p1)
+
+(@cwl ???)   ;fill in your CWL here (same CWL you put for problem sets)
+
+(@problem 1) ;DO NOT EDIT OR DELETE THIS LINE!
+
+(@signature ((listof X) -> Boolean) (X -> Y) (listof X) (listof Y) -> (listof Y))
+;; 4 args
+;; c is list
+;; first arg to a is list
+;; arg to b, list element of c are x
+;; d is list
+;; of result type of b
+
+
+(define (foo a b c d)
+  (cond [(a c) d]
+        [else
+         (cons (b (first c))
+               (foo a b (rest c) d))]))
+
+
