@@ -5,7 +5,7 @@
 
 (@assignment f-p5)
 
-(@cwl ycheun07)   ;fill in your CWL here (same CWL you put for 110 problem sets)
+(@cwl ???)   ;fill in your CWL here (same CWL you put for 110 problem sets)
 
 (@problem 1) ;This is actually problem 5, DO NOT EDIT OR DELETE THIS LINE!
 
@@ -105,40 +105,42 @@
 
 (@htdf find-increasing-path)
 (@signature String String -> (listof String) or false)
-;; find first increasing path from starter to destination node; false if none
-(check-expect (find-increasing-path "A" "A") (list "A"))
-(check-expect (find-increasing-path "D" "I") false)
+;; path from start to to in which numbers strictly increase
 (check-expect (find-increasing-path "A" "C") (list "A" "B" "C"))
+(check-expect (find-increasing-path "D" "I") false)
+(check-expect (find-increasing-path "A" "I") (list "A" "H" "I"))
+(check-expect (find-increasing-path "D" "G") (list "D" "E" "F" "G"))
 
-(@template String)
- 
-(define (find-increasing-path start end)
-  ;; Termination argument:
-  ;; trivial:
-  ;; reduction:
-  ;; argument:
-  (local [;; acc is (listof String); current path so far
-          (define (fn-for-node n acc)
-            (cond [(empty? acc) (fn-for-los (node-nexts n)
-                                            (list (node-name n)))]
-                  [(> (node-num n) (node-num (lookup-node (first acc))))
-                   (fn-for-los (cons (node-name n) acc)
-                               (fn-for-los (node-nexts n)
-                                           (cons (node-name n) acc)))]
-                  [else false]))
+(@template Node (listof String) String try-catch accumulator encapsulated)
 
-          (define (fn-for-los los acc)
-            (cond [(empty? los) false]
+(define (find-increasing-path start to)
+  ;; path is (listof String); names of nodes on this path in the graph
+  ;; prev is Natural; number of the immediately prior node on this graph
+  (local [(define (find/node n path prev)
+            (cond [(<= (node-num n) prev) false]
+                  [(string=? (node-name n) to)
+                   (reverse (cons (node-name n) path))]
                   [else
-                   (local [(define try (fn-for-string (first los) acc))]
+                   (find/loname (node-nexts n)
+                                (cons (node-name n) path)
+                                (node-num n))]))
+          
+          (define (find/loname lon path prev)
+            (cond [(empty? lon) false]
+                  [else
+                   (local [(define try (find/node (lookup-node (first lon))
+                                                  path
+                                                  prev))]
                      (if (not (false? try))
                          try
-                         (fn-for-los (rest los) acc)))]))
+                         (find/loname (rest lon) path prev)))]))
 
-          (define (fn-for-string s acc)
-            (fn-for-node (lookup-node s) acc))]
+          (define (find/name n path prev)
+            (find/node (lookup-node n) path prev))]
     
-    (fn-for-string start empty)))
+    (find/name start empty 0)))
+
+
 
 
 

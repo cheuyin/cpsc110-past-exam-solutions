@@ -88,7 +88,48 @@
     (find/name start empty 0)))
 
 
+(@template encapsulated Node (listof String) String)
+(define (find-increasing-path start to)
+  ;; Termination argument:
+  ;; trivial cases: reach a node already on path
+  ;; reduction: next nodes of current node
+  ;; argument: graph is finite, so detecting cycles with path will ensure that
+  ;; we eventually visit entire graph
+  ;; 
+  ;; n-wl is (listof Node): unvisited direct next nodes of the visited nodes
+  ;; path-wl is (listof (listof String)): path tandem worklist
+  ;; prev-wl is (listof Natural): previous node's number tandem worklist
+  ;;
+  ;; n-wl, path-wl and prev-wl always have same length, the elements of
+  ;; the 3 work lists correspond with each other - the nth element of
+  ;; path-wl is the path to reach the nth element of n-wl, the nth
+  ;; element in prev-wl is the number of node that occurs before the
+  ;; nth element in n-wl 
+  
+  (local [(define (find/node n path prev n-wl path-wl prev-wl)
+            (cond [(<= (node-num n) prev) (find/loname n-wl path-wl prev-wl)]
+                  [(string=? (node-name n) to)
+                   (reverse (cons (node-name n) path))]
+                  [else
+                   (find/loname (append (node-nexts n)
+                                        n-wl)
+                                (append (make-list (length (node-nexts n))
+                                                   (cons (node-name n) path))
+                                        path-wl)
+                                (append (make-list (length (node-nexts n))
+                                                   (node-num n))
+                                        prev-wl))]))
+          
+          (define (find/loname n-wl path-wl prev-wl)
+            (cond [(empty? n-wl) false]
+                  [else
+                   (find/name (first n-wl) (first path-wl) (first prev-wl)
+                              (rest n-wl)  (rest path-wl)  (rest prev-wl))]))
 
+          (define (find/name s path prev n-wl path-wl prev-wl)
+            (find/node (lookup-node s) path prev n-wl path-wl prev-wl))]
+    
+    (find/name start empty 0 empty empty empty)))
 
 
 
