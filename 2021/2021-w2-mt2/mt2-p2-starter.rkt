@@ -204,7 +204,7 @@ NOTE: This problem will be autograded, and ALL OF THE FOLLOWING ARE ESSENTIAL
 
 ; (define (find-grant-with-value emp price day amt) false)  ; stub
 
-(@template Employee ListOfEmployee ListOfGrant Grant
+(@template Employee ListOfEmployee ListOfGrant Grant try-catch
            encapsulated)
 
 (define (find-grant-with-value e0 price day amt)

@@ -1,20 +1,18 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p3-starter) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p2-solution) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require spd/tags)
 
-(@assignment exams/2021w2-mt2/mt2-p3)
+(@assignment exams/2021w2-mt2/mt2-p2)
 
 (@cwl ???) ;fill in your CWL here (same as for problem sets)
 
 (@problem 1) ;DO NOT EDIT OR DELETE THIS LINE!
 (@problem 2) ;DO NOT EDIT OR DELETE THIS LINE!
-(@problem 3) ;DO NOT EDIT OR DELETE THIS LINE!
 
 #|
 Consider the following data definitions, which are the same ones
-used for problems 1, 2 and 3.  Remember that there is background
-explanation of these data definitions in the problem 2 starter.
+used for problems 1, 2 and 3.
 |#
 
 (@htdd Employee ListOfEmployee ListOfGrant Grant)
@@ -50,14 +48,12 @@ explanation of these data definitions in the problem 2 starter.
 ;;     Again, all dates in this very strange company are represented
 ;;     as the day number since the company was formed.
 
-
 ;;
 ;; NOTE: SEE THE HANDOUT FIGURE WHICH WILL HELP YOU UNDERSTAND THE OVERALL
 ;;       STRUCTURE OF THESE EXAMPLES.
 ;;       WE ARE INCLUDING MORE EXAMPLES HERE THAN WOULD OTHERWISE BE NECESSARY
 ;;       TO EXPLAIN THE DATA DEFINITION.  YOU MAY WANT TO USE THESE EXAMPLES TO
 ;;       MAKE IT EASIER TO WRITE YOUR CHECK-EXPECTS.
-;;
 
 (define G1  (make-grant 2000  40 1095))
 (define G2  (make-grant 2000  50 1460))
@@ -76,7 +72,7 @@ explanation of these data definitions in the problem 2 starter.
 (define G15 (make-grant  500  40  365))
 (define G16 (make-grant  500  40  730))
 (define G17 (make-grant  500  40  365))
-(define G18 (make-grant 1000  40  730)) ;more shares than others at this level
+(define G18 (make-grant 1000  40  730)) ;more shares than other level 3
 (define G19 (make-grant  500  40 1095))
 
 (define LOGE empty)
@@ -95,7 +91,7 @@ explanation of these data definitions in the problem 2 starter.
 (define LOR123 (list E1 E2 E3))
 
             
-(@template Employee ListOfEmployee ListOfGrant Grant encapsulated)
+; (@template-origin Employee ListOfEmployee ListOfGrant Grant encapsulated)
 
 (define (fn-for-employee e)
   (local [(define (fn-for-employee e)
@@ -124,121 +120,48 @@ explanation of these data definitions in the problem 2 starter.
     (fn-for-employee e)))
 
 
+          
+(@htdf find-grant-with-value)
+(@signature Employee Number Natural Number -> Grant or false)
+;; produce first grant s.t. at given price, on given day, value is >= given val
+(check-expect (find-grant-with-value E8  50 364  2000) false)
+(check-expect (find-grant-with-value E8  50 365  2000) G17)   ;(mg  500 40 365)
+(check-expect (find-grant-with-value E8  50 366  2000) G17)   ;(mg  500 40 365)
+(check-expect (find-grant-with-value E8  50 500  4000) G17)   ;(mg  500 40 365)
+(check-expect (find-grant-with-value E1  60 365 09999) G11)   ;(mg  500 40 365)
+(check-expect (find-grant-with-value E1  60 365 10000) G11)   ;(mg  500 40 365)
+(check-expect (find-grant-with-value E1  60 365 10001) false)
+(check-expect (find-grant-with-value E1  50 730 10000) G18)   ;(mg 1000 40 730)
 
-#|
+            
+; (@template-origin Employee ListOfEmployee ListOfGrant Grant
+;                   try-catch      ;twice
+;                   encapsulated)
 
-In problem 3 we are also providing you with a fold function for Employee.
+(define (find-grant-with-value e price day val)
+  (local [(define (fn-for-employee e)
+            (local [(define try (fn-for-log (emp-grants e)))]
+              (if (not (false? try))
+                  try
+                  (fn-for-loe (emp-reports e)))))
 
-|#
-
-(@htdf fold-employee)
-(@signature (String Natural Y Z -> X)
-            (X Y -> Y)
-            (U Z -> Z)
-            (Natural Number Natural -> U)
-            Y
-            Z
-            Employee
-            -> X)
-;; abstract fold for employee
-
-(check-expect (fold-employee make-emp cons      ;Employee and (listof Employee) 
-                             cons make-grant    ;(listof Grant) and Grant
-                             empty empty
-                             E8)
-              E8)
-
-(@template Employee ListOfEmployee ListOfGrant Grant encapsulated)
-
-(define (fold-employee c1 c2 c3 c4 b1 b2 e)
-  (local [(define (fn-for-employee e)   ; --> X
-            (c1 (emp-name e)
-                (emp-hired e)
-                (fn-for-loe (emp-reports e))
-                (fn-for-log (emp-grants e))))
-
-          (define (fn-for-loe loe)      ; --> Y
-            (cond [(empty? loe) b1]
+          (define (fn-for-loe loe)
+            (cond [(empty? loe) false]
                   [else
-                   (c2 (fn-for-employee (first loe))
-                       (fn-for-loe (rest loe)))]))
+                   (local [(define try (fn-for-employee (first loe)))]
+                     (if (not (false? try))
+                         try
+                         (fn-for-loe (rest loe))))]))
 
-          (define (fn-for-log log)      ; --> Z
-            (cond [(empty? log) b2]
+          (define (fn-for-log log)
+            (cond [(empty? log) false]
                   [else
-                   (c3 (fn-for-grant (first log))
+                   (if (fn-for-grant (first log))
+                       (first log)
                        (fn-for-log (rest log)))]))
 
-          (define (fn-for-grant g)      ; --> U
-            (c4 (grant-shares g)
-                (grant-price g)
-                (grant-vests g)))]
+          (define (fn-for-grant g)
+            (and (<= (grant-vests g) day)
+                 (>= (* (grant-shares g) (- price (grant-price g))) val)))]
     
     (fn-for-employee e)))
-
-#|
-
-   >>> PLEASE READ THESE DIRECTIONS CAREFULLY. THREE TIMES OR MORE. <<<
-
-Design a function that consumes an Employee and a day number and produces
-the total number of grant shares in that tree that vest on or before that day.
-For example:
-
-(total-vested-by (make-emp "Azi" 1
-                           empty
-                           (list (make-grant 50 25 100)
-                                 (make-grant 75 50 200)))
-                 100)
-
-would be 50, because there is only one employee in the tree, that employee
-has two grants, the first one vests on day 100, but the second one does
-not vest until day 200.
-
-Also, using the constants defined above:
-
-(total-vested-by E7    7) should produce 0
-(total-vested-by E1 1825) should produce 17000
-
-
-Your function definition must call the fold-employee abstract function.
-Any anwser that uses the templates instead of calling fold-employee will
-receive 0 marks.
-
-
-NOTE: This problem will be autograded, and ALL OF THE FOLLOWING ARE ESSENTIAL
-      IN YOUR SOLUTION.  Failure to follow these requirements may result in
-      receiving zero marks for this problem.
-
- - the function you design must be called total-vested-by
- - you must include ALL relevant @ metadata tags
- - you must not comment out any @ metadata tags
- - your submission must pass the Check Syntax button
- - the function you design MUST NOT use the templates
- - the function you design MUST call the fold-employee abstract function
-
-|#
-
-(@htdf total-vested-by)
-(@signature Employee Natural -> Natural)
-;; produce number of shares in tree that vest on or before given day
-(check-expect (total-vested-by (make-emp "Azi" 1
-                                         empty
-                                         (list (make-grant 50 25 100)
-                                               (make-grant 75 50 200))) 100) 50)
-(check-expect (total-vested-by E7 7) 0)
-(check-expect (total-vested-by E1 1825) 17000)
-
-(@template use-abstract-fn)
-
-(define (total-vested-by e d)
-  (local [(define (c1 name hired rnmr rnh)
-            (+ rnmr rnh))
-
-          (define (c4 shares price vests)
-            (if (<= vests d)
-                shares
-                0))]
-    
-    (fold-employee c1 + + c4 0 0 e)))
-
-

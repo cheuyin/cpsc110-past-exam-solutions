@@ -74,8 +74,6 @@ NOTE: This problem will be substantially autograded, and ALL OF THE FOLLOWING
 (check-expect (euclid 25 15) 5)
 (check-expect (euclid 252 105) 21)
 
-; (define (euclid n1 n2) 1)  ; stub
-
 (@template genrec)
 
 (define (euclid n1 n2)
@@ -88,8 +86,8 @@ NOTE: This problem will be substantially autograded, and ALL OF THE FOLLOWING
   (cond [(= n1 n2) n1]
         [else
          (if (> n1 n2)
-             (euclid (abs (- n1 n2)) n2)
-             (euclid n1 (abs (- n1 n2))))]))
+             (euclid (- n1 n2) n2)
+             (euclid n1 (- n2 n1)))]))
         
 
 
