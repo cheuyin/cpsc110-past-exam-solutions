@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p2-starter) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p2-solution) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
 (require spd/tags)
 
 (@assignment exams/2021w1-mt2/mt2-p2)
@@ -11,14 +11,14 @@
 
 ;;
 ;; This problem is about grading a student's multiple choice reponses from a
-;; test. It is a 2 one of problem involving the following types:
+;; test. It is a two one of problem involving the following types:
 ;;
 
 
 (@htdd ListOfStudentAnswer)
 ;; ListOfStudentAnswer is one of:
 ;;  - empty
-;;  - (cons String ListOfStudentAnswer)
+;;  - (cons String ListOfStudentAnswer)r
 ;; interp. list of all a student's answers on a test
 ;;  "A" "B" "C"... are multiple choice answers
 ;;  "blank"        student left that answer blank
@@ -83,41 +83,61 @@
 
 (@htdf grade)
 (@signature ListOfStudentAnswer ListOfCorrectAnswer -> Integer)
-;; produce numerical grade for student's MC responses according to rubric
+;; produce a numerical grade for student answers according to rubric
 (check-expect (grade empty empty) 0)
-(check-expect (grade (list "A" "A" "B") empty) 0)
-(check-expect (grade empty (list "A" "D" "B" "C")) 0)
+(check-expect (grade (list "A" "D" "C") empty) 0)
+(check-expect (grade empty (list "A" "D" "C")) 0)
 (check-expect (grade (list "A" "D" "C") (list "A" "B" "C")) 1)
 (check-expect (grade (list "C" "blank" "A" "B") (list "C" "B" "A" "B")) 3)
 (check-expect (grade (list "D" "D" "blank") (list "B" "A" "C")) -2)
 (check-expect (grade (list "D" "D") (list "B" "D" "C")) 0)
 (check-expect (grade (list "A" "blank" "D") (list "A" "D")) 1)
 
-; (define (grade losa loca) 0)  ; stub
+;(define (grade losa loca) 0) 
 
-#|
-        LOSA        empty     (cons String LOSA)
-LOCA
-  
-empty               0 [1]     0 [1]
- 
-(cons String LOCA)  0 [1]     (+ (cond [(string=? "blank" (first losa)) 0]  [2]
-                                       [(string=? (first losa) (first loca)) 1]
-                                       [else -1])
-                                 (grade (rest losa) (rest loca)))
+(@template-origin 2-one-of)
+
+#|       LOCA        empty     (cons CA LOCA)
+
+LOSA
+
+empty                 0 [1]    0 [1]
+
+(cons SA LOSA)        0 [2]    (+ (cond [(string=? (first losa) "blank") 0] [3]
+                                        [(string=? (first losa) (first loca)) 1]
+                                        [else -1])
+                                  (grade (rest losa) (rest loca)))
+                                     
 |#
 
-(@template 2-one-of)
-
 (define (grade losa loca)
-  (cond [(or (empty? losa) (empty? loca)) 0]     ; 1
-        [else                                    
-         (+ (cond [(string=? "blank" (first losa)) 0]  ; 2
+  (cond [(empty? losa) 0] ;1
+        [(empty? loca) 0] ;2
+        [else
+         (+ (cond [(string=? (first losa) "blank") 0] ;3
                   [(string=? (first losa) (first loca)) 1]
                   [else -1])
-            (grade (rest losa) (rest loca)))]))
+            (grade (rest losa)(rest loca)))]))
 
+;; can be further simplified (not sure if we will require that)
 
+#|       LOCA        empty     (cons CA LOCA)
 
+LOSA
 
+empty                 0 [1]    0 [1]
 
+(cons SA LOSA)        0 [1]    (+ (cond [(string=? (first losa) "blank") 0] [2]
+                                        [(string=? (first losa) (first loca)) 1]
+                                        [else -1])
+                                  (grade (rest losa)(rest loca)))
+                                     
+|#
+#;
+(define (grade losa loca)
+  (cond [(or (empty? losa) (empty? loca)) 0]               ;1
+        [else
+         (+ (cond [(string=? (first losa) "blank") 0]      ;2
+                  [(string=? (first losa) (first loca)) 1]
+                  [else -1])
+            (grade (rest losa)(rest loca)))]))
