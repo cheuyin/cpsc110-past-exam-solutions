@@ -46,7 +46,7 @@ https://cs110.students.cs.ubc.ca/exams/2021w1-mt2/mt2-p4-figure.pdf
 
 ;(define (escher-square l) empty-image)
 
-(@template-origin genrec)
+; (@template-origin genrec)
 ;; Termination argument
 ;; base case: l <= CUTOFF
 ;; reduction step: l /  2

@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p4-starter) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname mt2-p4-solution) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
 (require spd/tags)
 (require 2htdp/image)
 
@@ -8,10 +8,10 @@
 
 (@cwl ???)   ;fill in your CWL here (same CWL you put for 110 problem sets)
 
-(@problem 1) ;this is actually problem 4 - DO NOT EDIT OR DELETE THIS LINE!
+(@problem 1) ;this is actually problem 1 - DO NOT EDIT OR DELETE THIS LINE!
 
 (define COLOR "black")
-(define CUTOFF 50)      ; Minimum size
+(define CUTOFF 50)	; Minimum size
 
 #|
 In this problem you must complete the design of a function to draw escher
@@ -29,46 +29,40 @@ https://cs110.students.cs.ubc.ca/exams/2021w1-mt2/mt2-p4-figure.pdf
 |#
 
 (@htdf escher-square)
-(@signature Natural -> Image)
-;; render an escher square of size length s
-;; CONSTRAINT: s must be > 0
-(check-expect (escher-square (/ CUTOFF 2))
+(@signature Number -> Image)
+;; produce Escher square of the given size.
+(check-expect (escher-square CUTOFF) ;base
               (above (beside (one-quarter (/ CUTOFF 2))
                              (rotate 90 (one-quarter (/ CUTOFF 2))))
                      (beside (rotate 90 (one-quarter (/ CUTOFF 2)))
                              (one-quarter (/ CUTOFF 2)))))
-(check-expect (escher-square CUTOFF)
-              (above (beside (one-quarter CUTOFF)
-                             (rotate 90 (one-quarter CUTOFF)))
-                     (beside (rotate 90 (one-quarter CUTOFF))
-                             (one-quarter CUTOFF))))
-(check-expect (escher-square (* 2 CUTOFF))
+(check-expect (escher-square (* 2 CUTOFF)) ;one bigger than base
               (overlay (escher-square CUTOFF)
-                       (above (beside (one-quarter (* 2 CUTOFF))
-                                      (rotate 90 (one-quarter (* 2 CUTOFF))))
-                              (beside (rotate 90 (one-quarter (* 2 CUTOFF)))
-                                      (one-quarter (* 2 CUTOFF))))))
+                       (above (beside (one-quarter CUTOFF)
+                                      (rotate 90 (one-quarter CUTOFF)))
+                              (beside (rotate 90 (one-quarter CUTOFF))
+                                      (one-quarter CUTOFF)))))
+               
 
-; (define (escher-square s) empty-image)  ; stub
+;(define (escher-square l) empty-image)
 
-(@template genrec)
-
-(define (escher-square s)
-  ;; Termination argument
-  ;; trivial: s is <= CUTOFF
-  ;; reduction: s / 2 
-  ;; argument: since CUTOFF and s are both > 0, dividing s by 2 repeatedly
-  ;;           will eventually make s <= CUTOFF
-  (cond [(<= s CUTOFF) (above (beside (one-quarter s)
-                                      (rotate 90 (one-quarter s)))
-                              (beside (rotate 90 (one-quarter s))
-                                      (one-quarter s)))]
-        [else (overlay (escher-square (/ s 2))
-                       (above (beside (one-quarter s)
-                                      (rotate 90 (one-quarter s)))
-                              (beside (rotate 90 (one-quarter s))
-                                      (one-quarter s))))]))
-
+(@template-origin genrec)
+;; Termination argument
+;; base case: l <= CUTOFF
+;; reduction step: l /  2
+;; argument: since CUTOFF > 0, repeatedly dividing by 2 will
+;;           eventually be <= CUTOFF
+(define (escher-square l)
+  (cond [(<= l CUTOFF) 
+         (above (beside (one-quarter (/ l 2))
+                        (rotate 90 (one-quarter (/ l 2))))
+                (beside (rotate 90 (one-quarter (/ l 2)))
+                        (one-quarter (/ l 2))))]
+        [else (overlay (escher-square (/ l 2))
+                       (above (beside (one-quarter (/ l 2))
+                                      (rotate 90 (one-quarter (/ l 2))))
+                              (beside (rotate 90 (one-quarter (/ l 2)))
+                                      (one-quarter (/ l 2)))))]))
 
 
 
