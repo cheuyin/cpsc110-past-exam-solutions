@@ -81,16 +81,15 @@ Violating one or more will cause your solution to receive 0 marks.
 (@template use-abstract-fn fn-composition)
 
 (define (steps lo hi odd-color even-color)
-  (foldr (lambda (n rnr) (beside/align "bottom"
-                                       rnr
-                                       (if (zero? n)
-                                           empty-image
-                                           (text (number->string n)
-                                                 (* n SIZE-FACTOR)
-                                                 (if (odd? n) odd-color
-                                                     even-color)))))
-         empty-image
-         (build-list (add1 (- hi lo)) (lambda (n) (+ n lo)))))
+  (local [(define (render n) (if (zero? n)
+                                 empty-image
+                                 (text (number->string n)
+                                       (* n SIZE-FACTOR)
+                                       (if (odd? n) odd-color
+                                           even-color))))]
+    (foldr (lambda (x y) (beside/align "bottom" y x))
+           empty-image
+           (build-list (add1 (- hi lo)) (lambda (n) (render (+ n lo)))))))
 
 
 

@@ -31,7 +31,7 @@
                             empty-image))
 
 ;(define (steps lo hi odd-color even-color) empty-image) ; stub
-#;
+
 (@template-origin fn-composition use-abstract-fn)
 
 (define (steps lo hi odd-color even-color)
@@ -49,7 +49,6 @@
            (build-list (add1 (- hi lo))
                        (lambda (i)
                          (block (+lo i)))))))
-
 
 
 
